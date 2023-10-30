@@ -1,0 +1,162 @@
+{
+  "name": "high_mongodb_journal_file_fragmentation",
+  "description": "MongoDB is a popular NoSQL database used extensively for its flexibility, scalability, and high performance. In MongoDB, journal files are used for write-ahead logging and recovery in case of unexpected shutdowns. However, when these journal files become highly fragmented, it can cause performance degradation and even lead to data loss. This incident type refers to the problem of high journal file fragmentation in MongoDB that requires immediate attention from software engineers to prevent any further damage.",
+  "params": [
+    {
+      "name": "MONGODB_JOURNAL_DIR",
+      "value": ""
+    },
+    {
+      "name": "MONGO_LOG_FILE",
+      "value": ""
+    },
+    {
+      "name": "JOURNAL_COMMIT_INTERVAL_MS_500",
+      "value": ""
+    },
+    {
+      "name": "MONGODB_JOURNAL_DEVICE",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## High MongoDB Journal File Fragmentation\nMongoDB is a popular NoSQL database used extensively for its flexibility, scalability, and high performance. In MongoDB, journal files are used for write-ahead logging and recovery in case of unexpected shutdowns. However, when these journal files become highly fragmented, it can cause performance degradation and even lead to data loss. This incident type refers to the problem of high journal file fragmentation in MongoDB that requires immediate attention from software engineers to prevent any further damage."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB log for any errors or warnings related to journal file fragmentation"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep \"journal file\" ${MONGO_LOG_FILE}`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Get fragmentation percentage of MongoDB journal files"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo debugfs -R \"stat ${MONGODB_JOURNAL_DEVICE}\" | grep \"Fragmentation percentage\"`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check available free space on MongoDB journal device"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `df -h ${MONGODB_JOURNAL_DEVICE}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB's journal commit interval"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --eval \"db.adminCommand({getParameter:1, journalCommitInterval:1})\"`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB's current journal write concern"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --eval \"db.adminCommand({getLastErrorDefaults:1}).getLastErrorDefaults.j\"`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB journal file size"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo ls -l ${MONGODB_JOURNAL_DIR} | grep \"mongo\"`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB journaling options"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --eval \"db.serverCmdLineOpts().parsed.storage.journal\"`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check current MongoDB journal usage"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --eval \"db.adminCommand({getCmdLineOpts:1}).parsed.journal\"`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check MongoDB's current journal commit wait time"
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --eval \"db.adminCommand({getParameter:1, journalCommitIntervalMs:1})\"`"
+    },
+    {
+      "name": "cell_20",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the journal commit interval to reduce the frequency of disk writes."
+    },
+    {
+      "name": "cell_21",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_mongodb_conf_edit($JOURNAL_COMMIT_INTERVAL_MS_500)"
+    }
+  ]
+}
